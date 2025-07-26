@@ -1,112 +1,122 @@
 <!DOCTYPE html><html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sinyal Forex Pro</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #0f172a;
-      color: #f8fafc;
-      text-align: center;
-      padding: 2rem;
-    }
-    select, button {
-      padding: 0.5rem;
-      font-size: 1rem;
-      margin: 0.5rem;
-    }
-    .signal-box {
-      margin-top: 2rem;
-      font-size: 2rem;
-      font-weight: bold;
-    }
-    .buy { color: #4ade80; }
-    .sell { color: #f87171; }
-    .wait { color: #facc15; }
-  </style>
-</head>
-<body>
-  <h1>Sinyal Forex Pro</h1>  <div>
-    <label for="pair">Pair:</label>
-    <select id="pair">
-      <option value="USDJPY">USD/JPY</option>
-      <option value="EURUSD">EUR/USD</option>
-      <option value="GBPUSD">GBP/USD</option>
-    </select><label for="timeframe">Timeframe:</label>
-<select id="timeframe">
-  <option value="1m">1 Menit</option>
-  <option value="15m">15 Menit</option>
-</select>
-
-<button onclick="analisaTeknikal()">Lihat Analisa</button>
-
-  </div>  <div class="signal-box" id="hasilSinyal"></div>  <script>
-    function generateDummyData(length = 100) {
-      let data = [100];
-      for (let i = 1; i < length; i++) {
-        const next = data[i - 1] + (Math.random() - 0.5) * 2;
-        data.push(parseFloat(next.toFixed(2)));
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sinyal Forex Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/technicalindicators@3.1.0/dist/browser.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f3f4f6;
       }
-      return data;
+      h1 {
+        text-align: center;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      .button {
+        display: block;
+        margin: 20px auto;
+        padding: 10px 20px;
+        background-color: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      .button:hover {
+        background-color: #2563eb;
+      }
+      .result {
+        text-align: center;
+        font-size: 20px;
+        margin-top: 20px;
+      }
+      .chart-container {
+        margin-top: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Sinyal Forex Pro</h1>
+      <button class="button" onclick="tampilkanSinyal()">Lihat Analisa</button>
+      <div class="result" id="sinyalHasil"></div><div class="chart-container">
+    <h2>📊 USDJPY – 1 Menit</h2>
+    <div class="tradingview-widget-container">
+      <div id="tvchart1m"></div>
+    </div>
+
+    <h2>📊 USDJPY – 15 Menit</h2>
+    <div class="tradingview-widget-container">
+      <div id="tvchart15m"></div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  function tampilkanSinyal() {
+    const data = [145.6, 145.8, 145.9, 145.7, 145.5, 145.3, 145.4, 145.6, 145.9, 146.0, 146.2, 146.1, 146.3, 146.5, 146.6, 146.4, 146.2, 146.0, 145.8, 145.7, 145.9, 146.0, 146.1, 146.2, 146.4, 146.3, 146.1, 145.9, 145.8, 145.7];
+
+    const ema20 = window.technicalindicators.EMA.calculate({ period: 20, values: data });
+    const ema50 = window.technicalindicators.EMA.calculate({ period: 50, values: data });
+    const rsi14 = window.technicalindicators.RSI.calculate({ period: 14, values: data });
+
+    const latestEma20 = ema20[ema20.length - 1];
+    const latestEma50 = ema50[ema50.length - 1];
+    const latestRsi = rsi14[rsi14.length - 1];
+
+    let sinyal = "⏸️ Sinyal: TUNGGU";
+    if (latestEma20 > latestEma50 && latestRsi < 70) {
+      sinyal = "✅ Sinyal: BUY";
+    } else if (latestEma20 < latestEma50 && latestRsi > 30) {
+      sinyal = "❌ Sinyal: SELL";
     }
 
-    function calculateEMA(data, period) {
-      const k = 2 / (period + 1);
-      let ema = [data[0]];
-      for (let i = 1; i < data.length; i++) {
-        ema.push((data[i] - ema[i - 1]) * k + ema[i - 1]);
-      }
-      return ema;
-    }
+    document.getElementById("sinyalHasil").innerText = sinyal;
+  }
 
-    function calculateRSI(data, period = 14) {
-      let gains = 0;
-      let losses = 0;
-      for (let i = 1; i <= period; i++) {
-        let change = data[i] - data[i - 1];
-        if (change >= 0) gains += change;
-        else losses -= change;
-      }
-      let avgGain = gains / period;
-      let avgLoss = losses / period;
-      let rs = avgGain / avgLoss;
-      let rsi = [100 - 100 / (1 + rs)];
+  new TradingView.widget({
+    container_id: "tvchart1m",
+    autosize: true,
+    symbol: "FX:USDJPY",
+    interval: "1",
+    timezone: "Asia/Jakarta",
+    theme: "light",
+    style: "1",
+    locale: "id",
+    toolbar_bg: "#f1f3f6",
+    enable_publishing: false,
+    allow_symbol_change: false,
+    hide_top_toolbar: true,
+  });
 
-      for (let i = period + 1; i < data.length; i++) {
-        let change = data[i] - data[i - 1];
-        if (change >= 0) {
-          avgGain = (avgGain * (period - 1) + change) / period;
-          avgLoss = (avgLoss * (period - 1)) / period;
-        } else {
-          avgGain = (avgGain * (period - 1)) / period;
-          avgLoss = (avgLoss * (period - 1) - change) / period;
-        }
-        rs = avgGain / (avgLoss || 1);
-        rsi.push(100 - 100 / (1 + rs));
-      }
-      return rsi;
-    }
+  new TradingView.widget({
+    container_id: "tvchart15m",
+    autosize: true,
+    symbol: "FX:USDJPY",
+    interval: "15",
+    timezone: "Asia/Jakarta",
+    theme: "light",
+    style: "1",
+    locale: "id",
+    toolbar_bg: "#f1f3f6",
+    enable_publishing: false,
+    allow_symbol_change: false,
+    hide_top_toolbar: true,
+  });
+</script>
+<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 
-    function analisaTeknikal() {
-      const harga = generateDummyData();
-      const ema20 = calculateEMA(harga, 20);
-      const ema50 = calculateEMA(harga, 50);
-      const rsi = calculateRSI(harga);
-
-      const terakhir = harga.length - 1;
-      const sinyal = document.getElementById("hasilSinyal");
-
-      if (ema20[terakhir] > ema50[terakhir] && rsi[rsi.length - 1] < 70) {
-        sinyal.textContent = "SINYAL: BUY";
-        sinyal.className = "signal-box buy";
-      } else if (ema20[terakhir] < ema50[terakhir] && rsi[rsi.length - 1] > 30) {
-        sinyal.textContent = "SINYAL: SELL";
-        sinyal.className = "signal-box sell";
-      } else {
-        sinyal.textContent = "SINYAL: TUNGGU";
-        sinyal.className = "signal-box wait";
-      }
-    }
-  </script></body>
+  </body>
 </html>
