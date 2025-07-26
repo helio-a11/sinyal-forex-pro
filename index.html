@@ -1,131 +1,131 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sinyal Forex Pro</title>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sinyal Forex Pro</title>
+  
+  <!-- Charting Library & Indicators -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/technicalindicators@3.1.0/dist/browser.js"></script>
+  <script src="https://s3.tradingview.com/tv.js"></script>
 
-    <!-- Chart.js dan indikator teknikal -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/technicalindicators@3.1.0/dist/browser.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      background-color: white;
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    button {
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .chart-section {
+      margin-top: 40px;
+    }
+    .tvchart {
+      width: 100%;
+      height: 400px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Sinyal Forex Pro</h1>
+    <button id="analisaBtn">Lihat Analisa</button>
+    <div class="result" id="hasilAnalisa">Klik tombol untuk melihat sinyal...</div>
 
-    <!-- TradingView Chart -->
-    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <div class="chart-section">
+      <h2>Grafik USDJPY (1 Menit)</h2>
+      <div id="tvchart1m" class="tvchart"></div>
 
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 20px;
-        background-color: #f3f4f6;
-      }
-      h1 {
-        text-align: center;
-      }
-      .container {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 20px;
-        background-color: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      }
-      .button {
-        display: block;
-        margin: 20px auto;
-        padding: 10px 20px;
-        background-color: #3b82f6;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 16px;
-      }
-      .button:hover {
-        background-color: #2563eb;
-      }
-      .result {
-        text-align: center;
-        font-size: 20px;
-        margin-top: 20px;
-      }
-      .chart-container {
-        margin-top: 40px;
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="container">
-      <h1>Sinyal Forex Pro</h1>
-
-      <button class="button" onclick="tampilkanSinyal()">Lihat Analisa</button>
-      <div class="result" id="sinyalHasil"></div>
-
-      <div class="chart-container">
-        <h2>📊 USDJPY – 1 Menit</h2>
-        <div class="tradingview-widget-container">
-          <div id="tvchart1m"></div>
-        </div>
-
-        <h2>📊 USDJPY – 15 Menit</h2>
-        <div class="tradingview-widget-container">
-          <div id="tvchart15m"></div>
-        </div>
-      </div>
+      <h2>Grafik USDJPY (15 Menit)</h2>
+      <div id="tvchart15m" class="tvchart"></div>
     </div>
+  </div>
 
-    <script>
-      function tampilkanSinyal() {
-        const data = [145.6, 145.8, 145.9, 145.7, 145.5, 145.3, 145.4, 145.6, 145.9, 146.0, 146.2, 146.1, 146.3, 146.5, 146.6, 146.4, 146.2, 146.0, 145.8, 145.7, 145.9, 146.0, 146.1, 146.2, 146.4, 146.3, 146.1, 145.9, 145.8, 145.7];
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // Tombol analisa teknikal
+      const button = document.getElementById("analisaBtn");
+      const hasil = document.getElementById("hasilAnalisa");
 
-        const ema20 = window.technicalindicators.EMA.calculate({ period: 20, values: data });
-        const ema50 = window.technicalindicators.EMA.calculate({ period: 50, values: data });
-        const rsi14 = window.technicalindicators.RSI.calculate({ period: 14, values: data });
+      button.addEventListener("click", function () {
+        const harga = [
+          145.6, 145.8, 145.9, 145.7, 145.5, 145.3, 145.4, 145.6,
+          145.9, 146.0, 146.2, 146.1, 146.3, 146.5, 146.6, 146.4,
+          146.2, 146.0, 145.8, 145.7, 145.9, 146.0, 146.1, 146.2,
+          146.4, 146.3, 146.1, 145.9, 145.8, 145.7
+        ];
 
-        const latestEma20 = ema20[ema20.length - 1];
-        const latestEma50 = ema50[ema50.length - 1];
-        const latestRsi = rsi14[rsi14.length - 1];
+        const ema20 = technicalindicators.EMA.calculate({ period: 20, values: harga });
+        const ema50 = technicalindicators.EMA.calculate({ period: 50, values: harga });
+        const rsi14 = technicalindicators.RSI.calculate({ period: 14, values: harga });
+
+        const e20 = ema20[ema20.length - 1] || 0;
+        const e50 = ema50[ema50.length - 1] || 0;
+        const rsi = rsi14[rsi14.length - 1] || 50;
 
         let sinyal = "⏸️ Sinyal: TUNGGU";
-        if (latestEma20 > latestEma50 && latestRsi < 70) {
-          sinyal = "✅ Sinyal: BUY";
-        } else if (latestEma20 < latestEma50 && latestRsi > 30) {
-          sinyal = "❌ Sinyal: SELL";
-        }
 
-        document.getElementById("sinyalHasil").innerText = sinyal;
-      }
+        if (e20 > e50 && rsi < 70) sinyal = "✅ Sinyal: BUY";
+        else if (e20 < e50 && rsi > 30) sinyal = "❌ Sinyal: SELL";
 
+        hasil.innerText = sinyal;
+      });
+
+      // Chart TradingView (1m)
       new TradingView.widget({
         container_id: "tvchart1m",
-        autosize: true,
+        width: "100%",
+        height: 400,
         symbol: "FX:USDJPY",
         interval: "1",
         timezone: "Asia/Jakarta",
         theme: "light",
         style: "1",
         locale: "id",
-        toolbar_bg: "#f1f3f6",
-        enable_publishing: false,
-        allow_symbol_change: false,
         hide_top_toolbar: true,
+        hide_legend: true,
+        allow_symbol_change: false
       });
 
+      // Chart TradingView (15m)
       new TradingView.widget({
         container_id: "tvchart15m",
-        autosize: true,
+        width: "100%",
+        height: 400,
         symbol: "FX:USDJPY",
         interval: "15",
         timezone: "Asia/Jakarta",
         theme: "light",
         style: "1",
         locale: "id",
-        toolbar_bg: "#f1f3f6",
-        enable_publishing: false,
-        allow_symbol_change: false,
         hide_top_toolbar: true,
+        hide_legend: true,
+        allow_symbol_change: false
       });
-    </script>
-  </body>
+    });
+  </script>
+</body>
 </html>
