@@ -1,34 +1,112 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sinyal Forex Pro</title>
   <style>
     body {
-      background: #1a1a1a;
-      color: #f1f1f1;
       font-family: Arial, sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
       text-align: center;
-      padding: 2em;
+      padding: 2rem;
     }
-    h1 {
-      color: #00ffcc;
+    select, button {
+      padding: 0.5rem;
+      font-size: 1rem;
+      margin: 0.5rem;
     }
-    .card {
-      margin-top: 2em;
-      background: #2a2a2a;
-      padding: 2em;
-      border-radius: 1em;
-      box-shadow: 0 0 10px rgba(0,255,200,0.2);
+    .signal-box {
+      margin-top: 2rem;
+      font-size: 2rem;
+      font-weight: bold;
     }
+    .buy { color: #4ade80; }
+    .sell { color: #f87171; }
+    .wait { color: #facc15; }
   </style>
 </head>
 <body>
-  <h1>Sinyal Forex Pro 🔥</h1>
-  <div class="card">
-    <p>Web app AI kamu sudah aktif!</p>
-    <p>Segera tambahkan sinyal teknikal seperti EMA, RSI, dan lainnya.</p>
-  </div>
-</body>
+  <h1>Sinyal Forex Pro</h1>  <div>
+    <label for="pair">Pair:</label>
+    <select id="pair">
+      <option value="USDJPY">USD/JPY</option>
+      <option value="EURUSD">EUR/USD</option>
+      <option value="GBPUSD">GBP/USD</option>
+    </select><label for="timeframe">Timeframe:</label>
+<select id="timeframe">
+  <option value="1m">1 Menit</option>
+  <option value="15m">15 Menit</option>
+</select>
+
+<button onclick="analisaTeknikal()">Lihat Analisa</button>
+
+  </div>  <div class="signal-box" id="hasilSinyal"></div>  <script>
+    function generateDummyData(length = 100) {
+      let data = [100];
+      for (let i = 1; i < length; i++) {
+        const next = data[i - 1] + (Math.random() - 0.5) * 2;
+        data.push(parseFloat(next.toFixed(2)));
+      }
+      return data;
+    }
+
+    function calculateEMA(data, period) {
+      const k = 2 / (period + 1);
+      let ema = [data[0]];
+      for (let i = 1; i < data.length; i++) {
+        ema.push((data[i] - ema[i - 1]) * k + ema[i - 1]);
+      }
+      return ema;
+    }
+
+    function calculateRSI(data, period = 14) {
+      let gains = 0;
+      let losses = 0;
+      for (let i = 1; i <= period; i++) {
+        let change = data[i] - data[i - 1];
+        if (change >= 0) gains += change;
+        else losses -= change;
+      }
+      let avgGain = gains / period;
+      let avgLoss = losses / period;
+      let rs = avgGain / avgLoss;
+      let rsi = [100 - 100 / (1 + rs)];
+
+      for (let i = period + 1; i < data.length; i++) {
+        let change = data[i] - data[i - 1];
+        if (change >= 0) {
+          avgGain = (avgGain * (period - 1) + change) / period;
+          avgLoss = (avgLoss * (period - 1)) / period;
+        } else {
+          avgGain = (avgGain * (period - 1)) / period;
+          avgLoss = (avgLoss * (period - 1) - change) / period;
+        }
+        rs = avgGain / (avgLoss || 1);
+        rsi.push(100 - 100 / (1 + rs));
+      }
+      return rsi;
+    }
+
+    function analisaTeknikal() {
+      const harga = generateDummyData();
+      const ema20 = calculateEMA(harga, 20);
+      const ema50 = calculateEMA(harga, 50);
+      const rsi = calculateRSI(harga);
+
+      const terakhir = harga.length - 1;
+      const sinyal = document.getElementById("hasilSinyal");
+
+      if (ema20[terakhir] > ema50[terakhir] && rsi[rsi.length - 1] < 70) {
+        sinyal.textContent = "SINYAL: BUY";
+        sinyal.className = "signal-box buy";
+      } else if (ema20[terakhir] < ema50[terakhir] && rsi[rsi.length - 1] > 30) {
+        sinyal.textContent = "SINYAL: SELL";
+        sinyal.className = "signal-box sell";
+      } else {
+        sinyal.textContent = "SINYAL: TUNGGU";
+        sinyal.className = "signal-box wait";
+      }
+    }
+  </script></body>
 </html>
